@@ -71,6 +71,7 @@ return {
     }
   end,
   keys = {
-    { '<Leader>at', '<cmd>ToggleTerm direction=horizontal<CR>', desc = 'terminal bottom' },
+    { '<C-\\>', '<cmd>ToggleTerm<CR>', desc = 'terminal bottom' },
+    { '2<C-\\>', '<cmd>2ToggleTerm<CR>', desc = 'terminal bottom' },
   },
 }
