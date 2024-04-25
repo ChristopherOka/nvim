@@ -561,7 +561,7 @@ require('lazy').setup({
           width = math.floor(0.7 * vim.fn.winwidth(0)),
           height = math.floor(0.8 * vim.fn.winheight(0)),
           winblend = 0,
-          title_pos = "center"
+          title_pos = 'center',
         },
         winbar = {
           enabled = true,
@@ -591,6 +591,70 @@ require('lazy').setup({
           tailwind = true,
         },
       }
+    end,
+  },
+  {
+    'goolord/alpha-nvim',
+    config = function()
+      local alpha = require 'alpha'
+      local dashboard = require 'alpha.themes.dashboard'
+      local datetime = os.date ' %H:%M. '
+      local num_plugins_loaded = require('lazy').stats().loaded
+      local cwd = string.match(vim.fn.getcwd(), ".*/(.+)")
+
+      local directory_section = {
+        type = 'text',
+        val = cwd,
+        opts = {
+          position = 'center',
+        },
+      }
+      local top_section = {
+        type = 'text',
+        val = 'Hi Chris,' .. " It's" .. datetime .. 'How are you doing today?',
+        opts = {
+          position = 'center',
+        },
+      }
+
+      dashboard.section.buttons.val = {
+        dashboard.button('Space p', '🔍  Find File', '<leader>p'),
+        dashboard.button(':Ex', '🗺  Explore', '<cmd>:Ex<CR>'),
+        dashboard.button('%', '📄  New file', '<cmd>:Ex<CR>%'),
+        dashboard.button('d', '📁  New folder', '<cmd>:Ex<CR>d'),
+        dashboard.button('q', '❌  Quit NVIM', '<cmd>:qa<CR>'),
+      }
+
+      local footer = {
+        type = 'text',
+        val = { '⚡' .. num_plugins_loaded .. ' plugins loaded.' },
+        opts = { position = 'center', hl = 'Comment' },
+      }
+
+      local section = {
+        header = dashboard.section.header,
+        directory_section = directory_section,
+        top_section = top_section,
+        buttons = dashboard.section.buttons,
+        footer = footer,
+      }
+
+      local opts = {
+        layout = {
+          { type = 'padding', val = 8 },
+          section.header,
+          { type = 'padding', val = 2 },
+          section.directory_section,
+          {type = 'padding', val = 2},
+          section.top_section,
+          { type = 'padding', val = 2 },
+          section.buttons,
+          { type = 'padding', val = 1 },
+          section.footer,
+        },
+      }
+
+      alpha.setup(opts)
     end,
   },
   require 'kickstart.plugins.lint',
