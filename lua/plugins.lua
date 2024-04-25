@@ -590,13 +590,14 @@ require('lazy').setup({
     config = function()
       function _G.set_terminal_keymaps()
         local opts = { noremap = true }
-        vim.api.nvim_buf_set_keymap(0, 't', '<esc>', [[<C-\><C-n>]], opts)
+        vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
         vim.keymap.set('t', 'jk', [[<C-\><C-n>]], opts)
         vim.keymap.set('t', '<C-h>', [[<C-\><C-n><C-W>h]], opts)
         vim.keymap.set('t', '<C-j>', [[<C-\><C-n><C-W>j]], opts)
         vim.keymap.set('t', '<C-k>', [[<C-\><C-n><C-W>k]], opts)
         vim.keymap.set('t', '<C-l>', [[<C-\><C-n><C-W>l]], opts)
         vim.keymap.set('t', '<C-w>', [[<C-\><C-n><C-w>]], opts)
+        vim.keymap.set('t', '<C-\\>', '<cmd>ToggleTerm<CR>', opts)
       end
 
       vim.cmd 'autocmd! TermOpen term://*toggleterm#* lua set_terminal_keymaps()'
@@ -656,7 +657,7 @@ require('lazy').setup({
       }
     end,
     keys = {
-      { '<C-\\>', '<cmd>ToggleTerm<CR>', desc = 'terminal bottom' },
+      { '<C-\\>', '<cmd>ToggleTerm direction="float"<CR>', desc = 'terminal bottom' },
       { '2<C-\\>', '<cmd>2ToggleTerm<CR>', desc = 'terminal bottom' },
     },
   },
