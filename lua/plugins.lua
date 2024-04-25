@@ -97,7 +97,11 @@ require('lazy').setup({
           --   i = { ['<c-enter>'] = 'to_fuzzy_refine' },
           -- },
         },
-        -- pickers = {}
+        pickers = {
+          find_files = {
+            hidden = true,
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -302,6 +306,7 @@ require('lazy').setup({
         '<leader>f',
         function()
           require('conform').format { async = true, lsp_fallback = true }
+          vim.lsp.buf.execute_command { command = '_typescript.organizeImports', arguments = { vim.fn.expand '%:p' } }
         end,
         mode = '',
         desc = '[F]ormat buffer',

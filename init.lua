@@ -77,4 +77,3 @@ require 'plugins'
 
 -- Configure theme
 vim.cmd 'colorscheme onedark_vivid'
-

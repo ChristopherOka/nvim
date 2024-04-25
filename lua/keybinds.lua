@@ -35,6 +35,9 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
--- Add keybind for code auto-fix
+-- Keybind for code auto-fix
 vim.keymap.set('n', '<leader>.', '<cmd>lua vim.lsp.buf.code_action()<CR>')
+
+-- Keybind for code descrioption
+vim.keymap.set('n', 'gh', '<cmd>lua vim.lsp.buf.hover()<CR>')
 
