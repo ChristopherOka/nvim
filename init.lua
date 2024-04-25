@@ -75,5 +75,3 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 require 'keybinds'
 require 'plugins'
 
--- Configure theme
-vim.cmd 'colorscheme onedark_vivid'

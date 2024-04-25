@@ -485,7 +485,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'javascript', 'json', 'typescript', 'tsx', 'python' },
+      ensure_installed = { 'bash', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'javascript', 'json', 'typescript', 'tsx', 'python' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -526,6 +526,17 @@ require('lazy').setup({
   {
     'olimorris/onedarkpro.nvim',
     priority = 1000,
+    config = function()
+      require('onedarkpro').setup {
+        styles = {
+          keywords = 'italic',
+          conditionals = 'italic',
+        },
+      }
+
+      -- Configure theme
+      vim.cmd 'colorscheme onedark_vivid'
+    end,
   },
   {
     'duane9/nvim-rg',
