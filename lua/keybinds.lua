@@ -1,5 +1,10 @@
--- Set visual mode keybinding from Esc to jk
+-- Set normal mode keybinding from Esc to jk
 vim.keymap.set('i', 'jk', '<Esc>')
+
+-- Map C-c to Esc for some edge cases where only Esc exits
+vim.keymap.set('n', '<C-c>', '<Esc>')
+vim.keymap.set('v', '<C-c>', '<Esc>')
+vim.keymap.set('i', '<C-c>', '<Esc>')
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
@@ -23,3 +28,5 @@ vim.keymap.set('v', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('v', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('v', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- Replace word under cursor
+vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])

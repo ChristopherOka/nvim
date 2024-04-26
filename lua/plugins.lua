@@ -66,6 +66,7 @@ require('lazy').setup({
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
+      local actions = require('telescope.actions')
       require('telescope').setup {
         defaults = {
           file_ignore_patterns = {
@@ -73,7 +74,8 @@ require('lazy').setup({
           },
           mappings = {
             -- Fuzzy search for anything in search buffer
-            i = { ['<C-Enter>'] = 'to_fuzzy_refine' },
+            i = { ['<C-Enter>'] = 'to_fuzzy_refine', ['<C-c>'] = actions.close },
+            n = { ['<C-c>'] = actions.close },
           },
         },
         pickers = {
@@ -478,6 +480,9 @@ require('lazy').setup({
   },
   {
     'mbbill/undotree',
+    config = function()
+      vim.keymap.set('n', '<leader>u', '<cmd>:UndotreeShow<CR>')
+    end,
   },
   { 'pocco81/auto-save.nvim' },
   {
@@ -600,7 +605,7 @@ require('lazy').setup({
       local dashboard = require 'alpha.themes.dashboard'
       local datetime = os.date ' %H:%M. '
       local num_plugins_loaded = require('lazy').stats().loaded
-      local cwd = string.match(vim.fn.getcwd(), ".*/(.+)")
+      local cwd = string.match(vim.fn.getcwd(), '.*/(.+)')
 
       local directory_section = {
         type = 'text',
@@ -645,7 +650,7 @@ require('lazy').setup({
           section.header,
           { type = 'padding', val = 2 },
           section.directory_section,
-          {type = 'padding', val = 2},
+          { type = 'padding', val = 2 },
           section.top_section,
           { type = 'padding', val = 2 },
           section.buttons,
