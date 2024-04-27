@@ -66,7 +66,7 @@ require('lazy').setup({
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
-      local actions = require('telescope.actions')
+      local actions = require 'telescope.actions'
       require('telescope').setup {
         defaults = {
           file_ignore_patterns = {
@@ -271,8 +271,12 @@ require('lazy').setup({
       {
         '<leader>f',
         function()
-          require('conform').format { async = true, lsp_fallback = true }
-          vim.lsp.buf.execute_command { command = '_typescript.organizeImports', arguments = { vim.fn.expand '%:p' } }
+          require('conform').format({
+            async = true,
+            lsp_fallback = true,
+          }, function()
+            vim.lsp.buf.execute_command { command = '_typescript.organizeImports', arguments = { vim.api.nvim_buf_get_name(0) } }
+          end)
         end,
         mode = '',
         desc = '[F]ormat buffer',
@@ -413,6 +417,10 @@ require('lazy').setup({
       auto_install = true,
       highlight = {
         enable = true,
+        additional_vim_regex_highlighting = false,
+        custom_captures = {
+          ['variable_declaration'] = 'Type',
+        },
       },
       indent = { enable = true },
       autotag = {
@@ -424,18 +432,18 @@ require('lazy').setup({
 
       -- Prefer git instead of curl in order to improve connectivity in some environments
       require('nvim-treesitter.install').prefer_git = true
-      ---@diagnostic disable-next-line: missing-fields
+      -- @diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
 
-      -- There are additional nvim-treesitter modules that you can use to interact
-      -- with nvim-treesitter. You should go explore a few and see what interests you:
-      --
-      --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-      --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-      --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
       vim.cmd [[
-      highlight link @tag.tsx @type
-      highlight link @lsp.typemod.variable.readonly.typescriptreact @type 
+      highlight! link @tag.tsx @type
+      highlight! link @lsp.typemod.variable.declaration.typescriptreact @type 
+      highlight! link @lsp.typemod.variable.readonly.typescriptreact @variable
+      highlight! link @lsp.type.enum.typescriptreact @variable
+      highlight! link @operator.tsx Delimiter
+      highlight! link @lsp.typemod.variable.defaultLibrary.typescriptreact @variable
+      highlight! link @constant.builtin.tsx Boolean
+      highlight! link @type.builtin.tsx Type
       ]]
     end,
   },
