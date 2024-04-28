@@ -12,7 +12,16 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
-  { 'numToStr/Comment.nvim', opts = {} },
+  {
+    -- Adds jsx support for commenting
+    'JoosepAlviste/nvim-ts-context-commentstring',
+  },
+  {
+    'numToStr/Comment.nvim',
+    config = function()
+      require('Comment').setup { pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook() }
+    end,
+  },
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {},
@@ -444,6 +453,8 @@ require('lazy').setup({
       highlight! link @lsp.typemod.variable.defaultLibrary.typescriptreact @variable
       highlight! link @constant.builtin.tsx Boolean
       highlight! link @type.builtin.tsx Type
+      highlight! link @lsp.mod.defaultLibrary.typescript @variable
+      highlight! link @lsp.typemod.defaultLibrary.typescript @variable
       ]]
     end,
   },
