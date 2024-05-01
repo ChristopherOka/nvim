@@ -460,6 +460,7 @@ require('lazy').setup({
       highlight! link @keyword.function.tsx @keyword.tsx
       highlight! link @variable_declaration @type
       highlight! link @declaration_array_member @type
+      highlight! link @declaration_object_member @type
       ]]
     end,
   },

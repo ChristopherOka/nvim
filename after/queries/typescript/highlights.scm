@@ -14,3 +14,15 @@
       ))
  (#set! "priority" 128)
  )
+
+(
+(variable_declarator
+   name: (object_pattern
+    (pair_pattern 
+     key: (property_identifier)
+     value: (identifier) @declaration_object_member
+    )
+  )
+)
+(#set! "priority" 128)
+ )
