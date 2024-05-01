@@ -427,9 +427,6 @@ require('lazy').setup({
       highlight = {
         enable = true,
         additional_vim_regex_highlighting = false,
-        custom_captures = {
-          ['variable_declaration'] = 'Type',
-        },
       },
       indent = { enable = true },
       autotag = {
@@ -443,18 +440,26 @@ require('lazy').setup({
       require('nvim-treesitter.install').prefer_git = true
       -- @diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
+      vim.api.nvim_set_hl(0, 'Parameter', { italic = true, fg = '#d19a66' })
 
       vim.cmd [[
       highlight! link @tag.tsx @type
       highlight! link @lsp.typemod.variable.declaration.typescriptreact @type 
+      highlight! link @lsp.typemod.function.local.typescriptreact Function
       highlight! link @lsp.typemod.variable.readonly.typescriptreact @variable
+      highlight! link @lsp.typemod.parameter.declaration.typescriptreact Parameter
+      highlight! link @lsp.typemod.property.declaration.typescriptreact @variable 
       highlight! link @lsp.type.enum.typescriptreact @variable
       highlight! link @operator.tsx Delimiter
       highlight! link @lsp.typemod.variable.defaultLibrary.typescriptreact @variable
       highlight! link @constant.builtin.tsx Boolean
-      highlight! link @type.builtin.tsx Type
+      highlight! link @type.builtin.tsx @type
       highlight! link @lsp.mod.defaultLibrary.typescript @variable
       highlight! link @lsp.typemod.defaultLibrary.typescript @variable
+      highlight! link @constant.builtin.typescript @Boolean
+      highlight! link @keyword.function.tsx @keyword.tsx
+      highlight! link @variable_declaration @type
+      highlight! link @declaration_array_member @type
       ]]
     end,
   },
