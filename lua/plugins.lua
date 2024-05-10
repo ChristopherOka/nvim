@@ -445,13 +445,19 @@ require('lazy').setup({
       vim.cmd [[
       highlight! link @tag.tsx @type
       highlight! link @lsp.typemod.variable.declaration.typescriptreact @type 
+      highlight! link @lsp.typemod.variable.declaration.typescript @type 
       highlight! link @lsp.typemod.function.local.typescriptreact Function
+      highlight! link @lsp.typemod.function.local.typescript Function
       highlight! link @lsp.typemod.variable.readonly.typescriptreact @variable
+      highlight! link @lsp.typemod.variable.readonly.typescript @variable
       highlight! link @lsp.typemod.parameter.declaration.typescriptreact Parameter
+      highlight! link @lsp.typemod.parameter.declaration.typescript Parameter
       highlight! link @lsp.typemod.property.declaration.typescriptreact @variable 
+      highlight! link @lsp.typemod.property.declaration.typescript @variable 
       highlight! link @lsp.type.enum.typescriptreact @variable
       highlight! link @operator.tsx Delimiter
       highlight! link @lsp.typemod.variable.defaultLibrary.typescriptreact @variable
+      highlight! link @lsp.typemod.variable.defaultLibrary.typescript @variable
       highlight! link @constant.builtin.tsx Boolean
       highlight! link @type.builtin.tsx @type
       highlight! link @lsp.mod.defaultLibrary.typescript @variable
