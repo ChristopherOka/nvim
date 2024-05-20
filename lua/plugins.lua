@@ -446,23 +446,32 @@ require('lazy').setup({
       highlight! link @tag.tsx @type
       highlight! link @lsp.typemod.variable.declaration.typescriptreact @type 
       highlight! link @lsp.typemod.variable.declaration.typescript @type 
+      highlight! link @lsp.typemod.variable.declaration.javascript @type 
       highlight! link @lsp.typemod.function.local.typescriptreact Function
       highlight! link @lsp.typemod.function.local.typescript Function
+      highlight! link @lsp.typemod.function.local.javascript Function
       highlight! link @lsp.typemod.variable.readonly.typescriptreact @variable
       highlight! link @lsp.typemod.variable.readonly.typescript @variable
+      highlight! link @lsp.typemod.variable.readonly.javascript @variable
       highlight! link @lsp.typemod.parameter.declaration.typescriptreact Parameter
       highlight! link @lsp.typemod.parameter.declaration.typescript Parameter
+      highlight! link @lsp.typemod.parameter.declaration.javascript Parameter
       highlight! link @lsp.typemod.property.declaration.typescriptreact @variable 
       highlight! link @lsp.typemod.property.declaration.typescript @variable 
+      highlight! link @lsp.typemod.property.declaration.javascript @variable 
       highlight! link @lsp.type.enum.typescriptreact @variable
       highlight! link @operator.tsx Delimiter
       highlight! link @lsp.typemod.variable.defaultLibrary.typescriptreact @variable
       highlight! link @lsp.typemod.variable.defaultLibrary.typescript @variable
+      highlight! link @lsp.typemod.variable.defaultLibrary.javascript @variable
       highlight! link @constant.builtin.tsx Boolean
       highlight! link @type.builtin.tsx @type
       highlight! link @lsp.mod.defaultLibrary.typescript @variable
+      highlight! link @lsp.mod.defaultLibrary.javascript @variable
       highlight! link @lsp.typemod.defaultLibrary.typescript @variable
+      highlight! link @lsp.typemod.defaultLibrary.javascript @variable
       highlight! link @constant.builtin.typescript @Boolean
+      highlight! link @constant.builtin.javscript @Boolean
       highlight! link @keyword.function.tsx @keyword.tsx
       highlight! link @variable_declaration @type
       highlight! link @declaration_array_member @type
