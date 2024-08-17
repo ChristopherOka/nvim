@@ -72,7 +72,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
     },
     config = function()
       local actions = require 'telescope.actions'
@@ -111,8 +111,10 @@ require('lazy').setup({
       vim.keymap.set('v', '<leader>p', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('v', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
+        { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('v', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
+        { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -144,6 +146,7 @@ require('lazy').setup({
             'prettierd',
             'tailwindcss-language-server',
             'typescript-language-server',
+            'pyright'
           },
         },
       }, -- NOTE: Must be loaded before dependants
@@ -475,26 +478,33 @@ require('lazy').setup({
 
       vim.cmd [[
       highlight! link @tag.tsx @type
-      highlight! link @lsp.typemod.variable.declaration.typescriptreact @type 
-      highlight! link @lsp.typemod.variable.declaration.typescript @type 
-      highlight! link @lsp.typemod.variable.declaration.javascript @type 
+      highlight! link @lsp.typemod.variable.declaration.typescriptreact @type
+      highlight! link @lsp.typemod.variable.declaration.typescript @type
+      highlight! link @lsp.typemod.variable.declaration.javascript @type
+      highlight! link @lsp.typemod.variable.declaration.javascriptreact @type
       highlight! link @lsp.typemod.function.local.typescriptreact Function
       highlight! link @lsp.typemod.function.local.typescript Function
       highlight! link @lsp.typemod.function.local.javascript Function
+      highlight! link @lsp.typemod.function.local.javascriptreact Function
       highlight! link @lsp.typemod.variable.readonly.typescriptreact @variable
       highlight! link @lsp.typemod.variable.readonly.typescript @variable
       highlight! link @lsp.typemod.variable.readonly.javascript @variable
+      highlight! link @lsp.typemod.variable.readonly.javascriptreact @variable
       highlight! link @lsp.typemod.parameter.declaration.typescriptreact Parameter
       highlight! link @lsp.typemod.parameter.declaration.typescript Parameter
       highlight! link @lsp.typemod.parameter.declaration.javascript Parameter
-      highlight! link @lsp.typemod.property.declaration.typescriptreact @variable 
-      highlight! link @lsp.typemod.property.declaration.typescript @variable 
-      highlight! link @lsp.typemod.property.declaration.javascript @variable 
+      highlight! link @lsp.typemod.parameter.declaration.javascriptreact Parameter
+      highlight! link @lsp.typemod.property.declaration.typescriptreact @variable
+      highlight! link @lsp.typemod.property.declaration.typescript @variable
+      highlight! link @lsp.typemod.property.declaration.javascript @variable
+      highlight! link @lsp.typemod.property.declaration.javascriptreact @variable
       highlight! link @lsp.type.enum.typescriptreact @variable
+      highlight! link @lsp.type.enum.javascriptreact @variable
       highlight! link @operator.tsx Delimiter
       highlight! link @lsp.typemod.variable.defaultLibrary.typescriptreact @variable
       highlight! link @lsp.typemod.variable.defaultLibrary.typescript @variable
       highlight! link @lsp.typemod.variable.defaultLibrary.javascript @variable
+      highlight! link @lsp.typemod.variable.defaultLibrary.javascriptreact @variable
       highlight! link @constant.builtin.tsx Boolean
       highlight! link @type.builtin.tsx @type
       highlight! link @lsp.mod.defaultLibrary.typescript @variable
@@ -504,9 +514,12 @@ require('lazy').setup({
       highlight! link @constant.builtin.typescript @Boolean
       highlight! link @constant.builtin.javscript @Boolean
       highlight! link @keyword.function.tsx @keyword.tsx
+      highlight! link @keyword.function.jsx @keyword.jsx
       highlight! link @variable_declaration @type
       highlight! link @declaration_array_member @type
       highlight! link @declaration_object_member @type
+      highlight! link @tag.builtin.tsx @variable
+      highlight! link @tag.builtin.jsx @variable
       ]]
     end,
   },
@@ -624,13 +637,13 @@ require('lazy').setup({
         },
         shade_filetypes = {},
         shade_terminals = false,
-        shading_factor = 1, -- the degree by which to darken to terminal colour, default: 1 for dark backgrounds, 3 for light
+        shading_factor = 1,       -- the degree by which to darken to terminal colour, default: 1 for dark backgrounds, 3 for light
         start_in_insert = true,
-        insert_mappings = true, -- whether or not the open mapping applies in insert mode
+        insert_mappings = true,   -- whether or not the open mapping applies in insert mode
         persist_size = true,
         direction = 'horizontal', -- | 'horizontal' | 'window' | 'float',
-        close_on_exit = true, -- close the terminal window when the process exits
-        shell = vim.o.shell, -- change the default shell
+        close_on_exit = true,     -- close the terminal window when the process exits
+        shell = vim.o.shell,      -- change the default shell
         -- This field is only relevant if direction is set to 'float'
         float_opts = {
           border = 'curved', -- single/double/shadow/curved
@@ -645,8 +658,8 @@ require('lazy').setup({
       }
     end,
     keys = {
-      { '<C-\\>', '<cmd>ToggleTerm direction="float" name="git"<CR>', desc = 'terminal float' },
-      { '2<C-\\>', '<cmd>2ToggleTerm<CR>', desc = 'terminal bottom' },
+      { '<C-\\>',  '<cmd>ToggleTerm direction="float" name="git"<CR>', desc = 'terminal float' },
+      { '2<C-\\>', '<cmd>2ToggleTerm<CR>',                             desc = 'terminal bottom' },
     },
   },
   {
@@ -733,9 +746,10 @@ require('lazy').setup({
       alpha.setup(opts)
     end,
   },
-  { 'github/copilot.vim' },
   {
     'davidosomething/format-ts-errors.nvim',
+  {
+    'github/copilot.vim',
   },
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
