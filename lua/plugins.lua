@@ -748,6 +748,7 @@ require('lazy').setup({
   },
   {
     'davidosomething/format-ts-errors.nvim',
+  },
   {
     'github/copilot.vim',
   },
