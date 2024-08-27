@@ -72,7 +72,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
       local actions = require 'telescope.actions'
@@ -111,10 +111,8 @@ require('lazy').setup({
       vim.keymap.set('v', '<leader>p', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
-        { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('v', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
-        { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('v', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -146,7 +144,7 @@ require('lazy').setup({
             'prettierd',
             'tailwindcss-language-server',
             'typescript-language-server',
-            'pyright'
+            'pyright',
           },
         },
       }, -- NOTE: Must be loaded before dependants
@@ -388,7 +386,6 @@ require('lazy').setup({
 
           -- Accept ([y]es) the completion.
           ['<C-y>'] = cmp.mapping.confirm { select = true },
-          ['<Tab>'] = cmp.mapping.confirm { select = true },
           ['<Enter>'] = cmp.mapping.confirm { select = true },
 
           -- Manually trigger a completion from nvim-cmp.
@@ -637,13 +634,13 @@ require('lazy').setup({
         },
         shade_filetypes = {},
         shade_terminals = false,
-        shading_factor = 1,       -- the degree by which to darken to terminal colour, default: 1 for dark backgrounds, 3 for light
+        shading_factor = 1, -- the degree by which to darken to terminal colour, default: 1 for dark backgrounds, 3 for light
         start_in_insert = true,
-        insert_mappings = true,   -- whether or not the open mapping applies in insert mode
+        insert_mappings = true, -- whether or not the open mapping applies in insert mode
         persist_size = true,
         direction = 'horizontal', -- | 'horizontal' | 'window' | 'float',
-        close_on_exit = true,     -- close the terminal window when the process exits
-        shell = vim.o.shell,      -- change the default shell
+        close_on_exit = true, -- close the terminal window when the process exits
+        shell = vim.o.shell, -- change the default shell
         -- This field is only relevant if direction is set to 'float'
         float_opts = {
           border = 'curved', -- single/double/shadow/curved
@@ -658,8 +655,8 @@ require('lazy').setup({
       }
     end,
     keys = {
-      { '<C-\\>',  '<cmd>ToggleTerm direction="float" name="git"<CR>', desc = 'terminal float' },
-      { '2<C-\\>', '<cmd>2ToggleTerm<CR>',                             desc = 'terminal bottom' },
+      { '<C-\\>', '<cmd>ToggleTerm direction="float" name="git"<CR>', desc = 'terminal float' },
+      { '2<C-\\>', '<cmd>2ToggleTerm<CR>', desc = 'terminal bottom' },
     },
   },
   {
@@ -751,6 +748,36 @@ require('lazy').setup({
   },
   {
     'github/copilot.vim',
+    config = function()
+      vim.keymap.set('i', 'cpe', '<cmd>:Copilot enable<CR>')
+      vim.keymap.set('n', 'cpe', '<cmd>:Copilot enable<CR>')
+      vim.keymap.set('i', 'cpd', '<cmd>:Copilot disable<CR>')
+      vim.keymap.set('n', 'cpd', '<cmd>:Copilot disable<CR>')
+      vim.keymap.set('i', 'cpp', '<cmd>:Copilot panel<CR>')
+      vim.keymap.set('n', 'cpp', '<cmd>:Copilot panel<CR>')
+      vim.keymap.set('i', 'cps', '<Plug>(copilot-suggest)')
+      vim.keymap.set('n', 'cps', '<Plug>(copilot-suggest)')
+      vim.keymap.set('i', 'cpn', '<Plug>(copilot-next)')
+      vim.keymap.set('n', 'cpn', '<Plug>(copilot-next)')
+      vim.keymap.set('i', 'cpb', '<Plug>(copilot-previous)')
+      vim.keymap.set('n', 'cpb', '<Plug>(copilot-previous)')
+      vim.cmd ':Copilot disable'
+    end,
+  },
+  {
+    'rmagatti/auto-session',
+    lazy = false,
+    dependencies = {
+      'nvim-telescope/telescope.nvim', -- Only needed if you want to use session lens
+    },
+
+    ---enables autocomplete for opts
+    ---@module "auto-session"
+    ---@type AutoSession.Config
+    opts = {
+      suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
+      -- log_level = 'debug',
+    },
   },
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
