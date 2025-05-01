@@ -233,7 +233,7 @@ require('lazy').setup({
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
       local servers = {
-        tsserver = {},
+        ts_ls = {},
         cssls = {},
         html = {},
         jsonls = {},
@@ -260,51 +260,52 @@ require('lazy').setup({
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
-      require('mason-lspconfig').setup {
+      local lspconfig = require 'lspconfig'
+      local function split_lines(str)
+        local t = {}
+        for line in str:gmatch '([^\n]*)\n?' do
+          -- gmatch finds each chunk up to a newline (the final chunk may not end in "\n")
+          table.insert(t, line)
+        end
+        return t
+      end
+
+      local function starts_with(str, prefix)
+        return str:sub(1, #prefix) == prefix
+      end
+
+      lspconfig.ts_ls.setup {
         handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for tsserver)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
+          ['textDocument/publishDiagnostics'] = function(_, result, ctx, config)
+            if result.diagnostics == nil then
+              return
+            end
 
-            -- Enable pretty typescript error formatting
-            local lspconfig = require 'lspconfig'
-            lspconfig.tsserver.setup {
-              handlers = {
-                ['textDocument/publishDiagnostics'] = function(_, result, ctx, config)
-                  if result.diagnostics == nil then
-                    return
-                  end
+            -- ignore some tsserver diagnostics
+            local idx = 1
+            while idx <= #result.diagnostics do
+              local entry = result.diagnostics[idx]
 
-                  -- ignore some tsserver diagnostics
-                  local idx = 1
-                  while idx <= #result.diagnostics do
-                    local entry = result.diagnostics[idx]
+              local formatter = require('format-ts-errors')[entry.code]
+              entry.message = formatter and formatter(entry.message) or entry.message
+              -- codes: https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
+              if entry.code == 80001 then
+                -- { message = "File is a CommonJS module; it may be converted to an ES module.", }
+                table.remove(result.diagnostics, idx)
+              else
+                idx = idx + 1
+              end
+            end
 
-                    local formatter = require('format-ts-errors')[entry.code]
-                    entry.message = formatter and formatter(entry.message) or entry.message
-
-                    -- codes: https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
-                    if entry.code == 80001 then
-                      -- { message = "File is a CommonJS module; it may be converted to an ES module.", }
-                      table.remove(result.diagnostics, idx)
-                    else
-                      idx = idx + 1
-                    end
-                  end
-
-                  vim.lsp.diagnostic.on_publish_diagnostics(_, result, ctx, config)
-                end,
-              },
-            }
+            vim.lsp.diagnostic.on_publish_diagnostics(_, result, ctx, config)
           end,
         },
       }
+
+      require('mason-lspconfig').setup()
     end,
   },
+  { 'ChristopherOka/format-ts-errors.nvim' },
   { -- Autoformat
     'stevearc/conform.nvim',
     lazy = false,
@@ -744,9 +745,6 @@ require('lazy').setup({
     end,
   },
   {
-    'davidosomething/format-ts-errors.nvim',
-  },
-  {
     'github/copilot.vim',
     config = function()
       vim.keymap.set('i', 'cpe', '<cmd>:Copilot enable<CR>')
@@ -767,9 +765,6 @@ require('lazy').setup({
   {
     'rmagatti/auto-session',
     lazy = false,
-    dependencies = {
-      'nvim-telescope/telescope.nvim', -- Only needed if you want to use session lens
-    },
 
     ---enables autocomplete for opts
     ---@module "auto-session"
