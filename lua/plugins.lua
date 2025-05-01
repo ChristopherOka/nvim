@@ -28,27 +28,25 @@ require('lazy').setup({
   },
   { -- Shows pending keybinds.
     'folke/which-key.nvim',
-    event = 'VimEnter',
-    config = function()
-      require('which-key').setup()
-
-      -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-        ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-        ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
-      }
-      -- visual mode
-      require('which-key').register({
-        ['<leader>h'] = { 'Git [H]unk' },
-      }, { mode = 'v' })
-    end,
+    event = 'VeryLazy',
+    keys = {
+      { '<leader>c', group = '[C]ode' },
+      { '<leader>c_', hidden = true },
+      { '<leader>d', group = '[D]ocument' },
+      { '<leader>d_', hidden = true },
+      { '<leader>h', group = 'Git [H]unk' },
+      { '<leader>h_', hidden = true },
+      { '<leader>r', group = '[R]ename' },
+      { '<leader>r_', hidden = true },
+      { '<leader>s', group = '[S]earch' },
+      { '<leader>s_', hidden = true },
+      { '<leader>t', group = '[T]oggle' },
+      { '<leader>t_', hidden = true },
+      { '<leader>w', group = '[W]orkspace' },
+      { '<leader>w_', hidden = true },
+      { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
+    },
   },
-
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
@@ -158,8 +156,12 @@ require('lazy').setup({
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
       { 'folke/neodev.nvim', opts = {} },
+      { 'ChristopherOka/format-ts-errors.nvim' },
     },
     config = function()
+      vim.diagnostic.config {
+        float = { border = 'rounded' },
+      }
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
@@ -197,7 +199,9 @@ require('lazy').setup({
           vim.keymap.set('v', '<leader>.', '<cmd>lua vim.lsp.buf.code_action()<CR>')
 
           -- Keybind for code descrioption
-          map('K', vim.lsp.buf.hover, 'Code Description')
+          map('K', function()
+            vim.lsp.buf.hover { border = 'rounded' }
+          end, 'Code Description')
           vim.keymap.set('v', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
 
           -- Go to Declaration (different than go to definition)
@@ -260,20 +264,22 @@ require('lazy').setup({
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      require('mason-lspconfig').setup {
+        ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
+        automatic_installation = false,
+        handlers = {
+          function(server_name)
+            local server = servers[server_name] or {}
+            -- This handles overriding only values explicitly passed
+            -- by the server configuration above. Useful when disabling
+            -- certain features of an LSP (for example, turning off formatting for ts_ls)
+            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            require('lspconfig')[server_name].setup(server)
+          end,
+        },
+      }
+
       local lspconfig = require 'lspconfig'
-      local function split_lines(str)
-        local t = {}
-        for line in str:gmatch '([^\n]*)\n?' do
-          -- gmatch finds each chunk up to a newline (the final chunk may not end in "\n")
-          table.insert(t, line)
-        end
-        return t
-      end
-
-      local function starts_with(str, prefix)
-        return str:sub(1, #prefix) == prefix
-      end
-
       lspconfig.ts_ls.setup {
         handlers = {
           ['textDocument/publishDiagnostics'] = function(_, result, ctx, config)
@@ -301,11 +307,8 @@ require('lazy').setup({
           end,
         },
       }
-
-      require('mason-lspconfig').setup()
     end,
   },
-  { 'ChristopherOka/format-ts-errors.nvim' },
   { -- Autoformat
     'stevearc/conform.nvim',
     lazy = false,
@@ -403,6 +406,18 @@ require('lazy').setup({
               luasnip.jump(-1)
             end
           end, { 'i', 's' }),
+        },
+        window = {
+          completion = {
+            scrollbar = false,
+            border = 'rounded',
+            winhighlight = 'Normal:CmpNormal',
+          },
+          documentation = {
+            scrollbar = false,
+            border = 'rounded',
+            winhighlight = 'Normal:CmpNormal',
+          },
         },
         sources = {
           { name = 'nvim_lsp' },
@@ -573,17 +588,53 @@ require('lazy').setup({
       require('neoscroll').setup {
         easing_function = 'sine',
       }
-      local t = {}
-      t['<C-u>'] = { 'scroll', { '-vim.wo.scroll', 'true', '150' } }
-      t['<C-d>'] = { 'scroll', { 'vim.wo.scroll', 'true', '150' } }
-      t['<C-b>'] = { 'scroll', { '-vim.api.nvim_win_get_height(0)', 'true', '450' } }
-      t['<C-f>'] = { 'scroll', { 'vim.api.nvim_win_get_height(0)', 'true', '450' } }
-      t['<C-y>'] = { 'scroll', { '-0.10', 'false', '100' } }
-      t['<C-e>'] = { 'scroll', { '0.10', 'false', '100' } }
-      t['zt'] = { 'zt', { '250' } }
-      t['zz'] = { 'zz', { '250' } }
-      t['zb'] = { 'zb', { '250' } }
-      require('neoscroll.config').set_mappings(t)
+
+      local neoscroll = require 'neoscroll'
+
+      -- define your custom scroll functions
+      local keymap = {
+        -- scroll by |&scroll| lines (the same as <C-u>/<C-d>)
+        ['<C-u>'] = function()
+          neoscroll.scroll(-vim.wo.scroll, { duration = 150 })
+        end,
+        ['<C-d>'] = function()
+          neoscroll.scroll(vim.wo.scroll, { duration = 150 })
+        end,
+
+        -- scroll by full window height
+        ['<C-b>'] = function()
+          neoscroll.scroll(-vim.api.nvim_win_get_height(0), { duration = 450 })
+        end,
+        ['<C-f>'] = function()
+          neoscroll.scroll(vim.api.nvim_win_get_height(0), { duration = 450 })
+        end,
+
+        -- scroll the viewport only (no cursor move) by 10% of window
+        ['<C-y>'] = function()
+          neoscroll.scroll(-0.1, { move_cursor = false, duration = 100 })
+        end,
+        ['<C-e>'] = function()
+          neoscroll.scroll(0.1, { move_cursor = false, duration = 100 })
+        end,
+
+        -- “zt”, “zz”, “zb” helpers take a `half_win_duration` option
+        ['zt'] = function()
+          neoscroll.zt { half_win_duration = 250 }
+        end,
+        ['zz'] = function()
+          neoscroll.zz { half_win_duration = 250 }
+        end,
+        ['zb'] = function()
+          neoscroll.zb { half_win_duration = 250 }
+        end,
+      }
+
+      -- map in normal, visual and select modes
+      for _, mode in ipairs { 'n', 'v', 'x' } do
+        for key, fn in pairs(keymap) do
+          vim.keymap.set(mode, key, fn, { silent = true })
+        end
+      end
     end,
   },
 
