@@ -30,21 +30,21 @@ require('lazy').setup({
     'folke/which-key.nvim',
     event = 'VeryLazy',
     keys = {
-      { '<leader>c', group = '[C]ode' },
+      { '<leader>c',  group = '[C]ode' },
       { '<leader>c_', hidden = true },
-      { '<leader>d', group = '[D]ocument' },
+      { '<leader>d',  group = '[D]ocument' },
       { '<leader>d_', hidden = true },
-      { '<leader>h', group = 'Git [H]unk' },
+      { '<leader>h',  group = 'Git [H]unk' },
       { '<leader>h_', hidden = true },
-      { '<leader>r', group = '[R]ename' },
+      { '<leader>r',  group = '[R]ename' },
       { '<leader>r_', hidden = true },
-      { '<leader>s', group = '[S]earch' },
+      { '<leader>s',  group = '[S]earch' },
       { '<leader>s_', hidden = true },
-      { '<leader>t', group = '[T]oggle' },
+      { '<leader>t',  group = '[T]oggle' },
       { '<leader>t_', hidden = true },
-      { '<leader>w', group = '[W]orkspace' },
+      { '<leader>w',  group = '[W]orkspace' },
       { '<leader>w_', hidden = true },
-      { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
+      { '<leader>h',  desc = 'Git [H]unk',  mode = 'v' },
     },
   },
   { -- Fuzzy Finder (files, lsp, etc)
@@ -70,7 +70,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
     },
     config = function()
       local actions = require 'telescope.actions'
@@ -109,8 +109,10 @@ require('lazy').setup({
       vim.keymap.set('v', '<leader>p', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('v', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
+        { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('v', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
+        { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -151,11 +153,11 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',                   opts = {} },
 
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
-      { 'folke/neodev.nvim', opts = {} },
+      { 'folke/neodev.nvim',                   opts = {} },
       { 'ChristopherOka/format-ts-errors.nvim' },
     },
     config = function()
@@ -320,7 +322,17 @@ require('lazy').setup({
             async = true,
             lsp_fallback = true,
           }, function()
-            vim.lsp.buf.execute_command { command = '_typescript.organizeImports', arguments = { vim.api.nvim_buf_get_name(0) } }
+            local client = vim.lsp.get_clients({ name = "ts_ls", bufnr = 0 })[1]
+            if client == nil then
+              return
+            end
+            client:exec_cmd({
+                title = "organize_imports",
+                command = '_typescript.organizeImports',
+                arguments = {
+                  vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf()) }
+              },
+              { bufnr = vim.api.nvim_get_current_buf() })
           end)
         end,
         mode = '',
@@ -329,18 +341,18 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        python = { 'isort', 'black' },
-        javascript = { { 'prettierd', 'prettier' } },
-        typescript = { { 'prettierd', 'prettier' } },
-        javascriptreact = { { 'prettierd', 'prettier' } },
-        css = { { 'prettierd', 'prettier' } },
-        html = { { 'prettierd', 'prettier' } },
-        json = { { 'prettierd', 'prettier' } },
-        markdown = { { 'prettierd', 'prettier' } },
-        typescriptreact = { { 'prettierd', 'prettier' } },
-      },
+    },
+    formatters_by_ft = {
+      lua = { 'stylua' },
+      python = { 'isort', 'black' },
+      javascript = { { 'prettierd', 'prettier' } },
+      typescript = { { 'prettierd', 'prettier' } },
+      javascriptreact = { { 'prettierd', 'prettier' } },
+      css = { { 'prettierd', 'prettier' } },
+      html = { { 'prettierd', 'prettier' } },
+      json = { { 'prettierd', 'prettier' } },
+      markdown = { { 'prettierd', 'prettier' } },
+      typescriptreact = { { 'prettierd', 'prettier' } },
     },
   },
 
@@ -686,13 +698,13 @@ require('lazy').setup({
         },
         shade_filetypes = {},
         shade_terminals = false,
-        shading_factor = 1, -- the degree by which to darken to terminal colour, default: 1 for dark backgrounds, 3 for light
+        shading_factor = 1,       -- the degree by which to darken to terminal colour, default: 1 for dark backgrounds, 3 for light
         start_in_insert = true,
-        insert_mappings = true, -- whether or not the open mapping applies in insert mode
+        insert_mappings = true,   -- whether or not the open mapping applies in insert mode
         persist_size = true,
         direction = 'horizontal', -- | 'horizontal' | 'window' | 'float',
-        close_on_exit = true, -- close the terminal window when the process exits
-        shell = vim.o.shell, -- change the default shell
+        close_on_exit = true,     -- close the terminal window when the process exits
+        shell = vim.o.shell,      -- change the default shell
         -- This field is only relevant if direction is set to 'float'
         float_opts = {
           border = 'curved', -- single/double/shadow/curved
@@ -707,8 +719,8 @@ require('lazy').setup({
       }
     end,
     keys = {
-      { '<C-\\>', '<cmd>ToggleTerm direction="float" name="git"<CR>', desc = 'terminal float' },
-      { '2<C-\\>', '<cmd>2ToggleTerm<CR>', desc = 'terminal bottom' },
+      { '<C-\\>',  '<cmd>ToggleTerm direction="float" name="git"<CR>', desc = 'terminal float' },
+      { '2<C-\\>', '<cmd>2ToggleTerm<CR>',                             desc = 'terminal bottom' },
     },
   },
   {
