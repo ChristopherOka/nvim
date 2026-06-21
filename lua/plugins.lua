@@ -10,7 +10,6 @@ vim.opt.rtp:prepend(lazypath)
 -- [[ Configure and install plugins ]]
 --
 require('lazy').setup({
-  -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
   {
     -- Adds jsx support for commenting
@@ -30,21 +29,21 @@ require('lazy').setup({
     'folke/which-key.nvim',
     event = 'VeryLazy',
     keys = {
-      { '<leader>c',  group = '[C]ode' },
+      { '<leader>c', group = '[C]ode' },
       { '<leader>c_', hidden = true },
-      { '<leader>d',  group = '[D]ocument' },
+      { '<leader>d', group = '[D]ocument' },
       { '<leader>d_', hidden = true },
-      { '<leader>h',  group = 'Git [H]unk' },
+      { '<leader>h', group = 'Git [H]unk' },
       { '<leader>h_', hidden = true },
-      { '<leader>r',  group = '[R]ename' },
+      { '<leader>r', group = '[R]ename' },
       { '<leader>r_', hidden = true },
-      { '<leader>s',  group = '[S]earch' },
+      { '<leader>s', group = '[S]earch' },
       { '<leader>s_', hidden = true },
-      { '<leader>t',  group = '[T]oggle' },
+      { '<leader>t', group = '[T]oggle' },
       { '<leader>t_', hidden = true },
-      { '<leader>w',  group = '[W]orkspace' },
+      { '<leader>w', group = '[W]orkspace' },
       { '<leader>w_', hidden = true },
-      { '<leader>h',  desc = 'Git [H]unk',  mode = 'v' },
+      { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
     },
   },
   { -- Fuzzy Finder (files, lsp, etc)
@@ -56,21 +55,13 @@ require('lazy').setup({
       'nvim-telescope/telescope-live-grep-args.nvim',
       {
         'nvim-telescope/telescope-fzf-native.nvim',
-
-        -- `build` is used to run some command when the plugin is installed/updated.
-        -- This is only run then, not every time Neovim starts up.
         build = 'make',
-
-        -- `cond` is a condition used to determine whether this plugin should be
-        -- installed and loaded.
         cond = function()
           return vim.fn.executable 'make' == 1
         end,
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
-
-      -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
       local actions = require 'telescope.actions'
@@ -78,6 +69,7 @@ require('lazy').setup({
         defaults = {
           file_ignore_patterns = {
             'node_modules',
+            'package%-lock.json',
           },
           mappings = {
             -- Fuzzy search for anything in search buffer
@@ -109,10 +101,8 @@ require('lazy').setup({
       vim.keymap.set('v', '<leader>p', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
-        { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('v', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
-        { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('v', '<leader>/', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -135,29 +125,23 @@ require('lazy').setup({
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     dependencies = {
-      -- Automatically install LSPs and related tools to stdpath for Neovim
       {
-        'williamboman/mason.nvim',
+        'williamboman/mason.nvim', -- must load before dependants
         config = true,
         opts = {
           ensure_installed = {
             'prettierd',
             'tailwindcss-language-server',
-            'typescript-language-server',
+            'tsgo',
             'pyright',
+            'sql_formatter',
           },
         },
-      }, -- NOTE: Must be loaded before dependants
+      },
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
-
-      -- Useful status updates for LSP.
-      -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim',                   opts = {} },
-
-      -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
-      -- used for completion, annotations and signatures of Neovim apis
-      { 'folke/neodev.nvim',                   opts = {} },
+      { 'j-hui/fidget.nvim', opts = {} },
+      { 'folke/neodev.nvim', opts = {} },
       { 'ChristopherOka/format-ts-errors.nvim' },
     },
     config = function()
@@ -167,49 +151,25 @@ require('lazy').setup({
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
-          -- NOTE: Remember that Lua is a real programming language, and as such it is possible
-          -- to define small helper and utility functions so you don't have to repeat yourself.
-
           local map = function(keys, func, desc)
             vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
 
-          -- Jump to the definition of the word under your cursor.
-          --  To jump back, press <C-t>.
           map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-
-          -- Find references for the word under your cursor.
           map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-
-          -- Jump to the implementation of the word under your cursor.
           map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-
-          -- Jump to the type of the word under your cursor.
           map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-
-          -- Fuzzy find all the symbols in your current document.
           map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-
-          -- Fuzzy find all the symbols in your current workspace.
           map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
-
-          -- Rename the variable under your cursor.
           map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-
-          -- Keybind for code auto-fix
           map('<leader>.', vim.lsp.buf.code_action, 'Code Autosuggestions')
           vim.keymap.set('v', '<leader>.', '<cmd>lua vim.lsp.buf.code_action()<CR>')
-
-          -- Keybind for code descrioption
           map('K', function()
             vim.lsp.buf.hover { border = 'rounded' }
           end, 'Code Description')
           vim.keymap.set('v', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
-
-          -- Go to Declaration (different than go to definition)
           map('gD', vim.lsp.buf.declaration, '[G]o to [D]eclaration')
 
-          -- The following two autocommands are used to highlight references of the
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           if client and client.server_capabilities.documentHighlightProvider then
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
@@ -223,10 +183,6 @@ require('lazy').setup({
             })
           end
 
-          -- The following autocommand is used to enable inlay hints in your
-          -- code, if the language server you are using supports them
-          --
-          -- This may be unwanted, since they displace some of your code
           if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
             map('<leader>th', function()
               vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled())
@@ -239,14 +195,13 @@ require('lazy').setup({
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
       local servers = {
-        ts_ls = {},
+        tsgo = {},
         cssls = {},
         html = {},
         jsonls = {},
         tailwindcss = {},
         pyright = {},
         eslint = {},
-        prettierd = {},
         lua_ls = {
           settings = {
             Lua = {
@@ -266,48 +221,49 @@ require('lazy').setup({
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
-      require('mason-lspconfig').setup {
-        ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
-        automatic_installation = false,
+      vim.lsp.config('*', { capabilities = capabilities })
+
+      local function prettify_ts_diagnostics(diagnostics)
+        if diagnostics == nil then
+          return
+        end
+        local idx = 1
+        while idx <= #diagnostics do
+          local entry = diagnostics[idx]
+          local formatter = require('format-ts-errors')[entry.code]
+          entry.message = formatter and formatter(entry.message) or entry.message
+          if entry.code == 80001 then
+            -- drop "File is a CommonJS module; it may be converted to an ES module."
+            table.remove(diagnostics, idx)
+          else
+            idx = idx + 1
+          end
+        end
+      end
+
+      servers.tsgo = {
         handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for ts_ls)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
+          ['textDocument/diagnostic'] = function(err, result, ctx, config)
+            if result ~= nil then
+              prettify_ts_diagnostics(result.items)
+              for _, related in pairs(result.relatedDocuments or {}) do
+                prettify_ts_diagnostics(related.items)
+              end
+            end
+            return vim.lsp.handlers['textDocument/diagnostic'](err, result, ctx, config)
           end,
         },
       }
 
-      local lspconfig = require 'lspconfig'
-      lspconfig.ts_ls.setup {
-        handlers = {
-          ['textDocument/publishDiagnostics'] = function(_, result, ctx, config)
-            if result.diagnostics == nil then
-              return
-            end
+      -- Register overrides before mason-lspconfig.setup so they're in place when its
+      -- automatic_enable calls vim.lsp.enable() for each installed server.
+      for name, cfg in pairs(servers) do
+        vim.lsp.config(name, cfg)
+      end
 
-            -- ignore some tsserver diagnostics
-            local idx = 1
-            while idx <= #result.diagnostics do
-              local entry = result.diagnostics[idx]
-
-              local formatter = require('format-ts-errors')[entry.code]
-              entry.message = formatter and formatter(entry.message) or entry.message
-              -- codes: https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
-              if entry.code == 80001 then
-                -- { message = "File is a CommonJS module; it may be converted to an ES module.", }
-                table.remove(result.diagnostics, idx)
-              else
-                idx = idx + 1
-              end
-            end
-
-            vim.lsp.diagnostic.on_publish_diagnostics(_, result, ctx, config)
-          end,
-        },
+      require('mason-lspconfig').setup {
+        ensure_installed = {},
+        automatic_installation = false,
       }
     end,
   },
@@ -321,18 +277,19 @@ require('lazy').setup({
           require('conform').format({
             async = true,
             lsp_fallback = true,
-          }, function()
-            local client = vim.lsp.get_clients({ name = "ts_ls", bufnr = 0 })[1]
-            if client == nil then
+          }, function(err)
+            if err then
               return
             end
-            client:exec_cmd({
-                title = "organize_imports",
-                command = '_typescript.organizeImports',
-                arguments = {
-                  vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf()) }
-              },
-              { bufnr = vim.api.nvim_get_current_buf() })
+            -- organize imports after formatting -- tsgo exposes this as a code
+            -- action (not a command); it sorts and drops unused imports.
+            if #vim.lsp.get_clients { name = 'tsgo', bufnr = 0 } == 0 then
+              return
+            end
+            vim.lsp.buf.code_action {
+              context = { only = { 'source.organizeImports' }, diagnostics = {} },
+              apply = true,
+            }
           end)
         end,
         mode = '',
@@ -341,18 +298,20 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-    },
-    formatters_by_ft = {
-      lua = { 'stylua' },
-      python = { 'isort', 'black' },
-      javascript = { { 'prettierd', 'prettier' } },
-      typescript = { { 'prettierd', 'prettier' } },
-      javascriptreact = { { 'prettierd', 'prettier' } },
-      css = { { 'prettierd', 'prettier' } },
-      html = { { 'prettierd', 'prettier' } },
-      json = { { 'prettierd', 'prettier' } },
-      markdown = { { 'prettierd', 'prettier' } },
-      typescriptreact = { { 'prettierd', 'prettier' } },
+      formatters_by_ft = {
+        lua = { 'stylua', stop_after_first = true },
+        python = { 'isort', 'black', stop_after_first = true },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        html = { 'prettierd', 'prettier', stop_after_first = true },
+        css = { 'prettierd', 'prettier', stop_after_first = true },
+        json = { 'prettierd', 'prettier', stop_after_first = true },
+        markdown = { 'prettierd', 'prettier', stop_after_first = true },
+        yaml = { 'prettierd', 'prettier', stop_after_first = true },
+        sql = { 'sql_formatter', stop_after_first = true },
+      },
     },
   },
 
@@ -364,9 +323,6 @@ require('lazy').setup({
       {
         'L3MON4D3/LuaSnip',
         build = (function()
-          -- Build Step is needed for regex support in snippets.
-          -- This step is not supported in many windows environments.
-          -- Remove the below condition to re-enable on windows.
           if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
             return
           end
@@ -378,7 +334,6 @@ require('lazy').setup({
       'hrsh7th/cmp-path',
     },
     config = function()
-      -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       luasnip.config.setup {}
@@ -391,23 +346,14 @@ require('lazy').setup({
         },
         completion = { completeopt = 'menu,menuone,noinsert' },
         mapping = cmp.mapping.preset.insert {
-          -- Select the [n]ext item
           ['<C-n>'] = cmp.mapping.select_next_item(),
-          -- Select the [p]revious item
           ['<C-p>'] = cmp.mapping.select_prev_item(),
-
-          -- Scroll the documentation window [b]ack / [f]orward
           ['<C-b>'] = cmp.mapping.scroll_docs(-4),
           ['<C-f>'] = cmp.mapping.scroll_docs(4),
-
-          -- Accept ([y]es) the completion.
           ['<C-y>'] = cmp.mapping.confirm { select = true },
           ['<Enter>'] = cmp.mapping.confirm { select = true },
-
-          -- Manually trigger a completion from nvim-cmp.
+          ['<Tab>'] = cmp.mapping.confirm { select = true },
           ['<C-Space>'] = cmp.mapping.complete {},
-
-          -- Think of <c-l> as moving to the right of your snippet expansion.
           ['<C-l>'] = cmp.mapping(function()
             if luasnip.expand_or_locally_jumpable() then
               luasnip.expand_or_jump()
@@ -446,30 +392,13 @@ require('lazy').setup({
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
-      -- Better Around/Inside textobjects
-      --
-      -- Examples:
-      --  - va)  - [v]isually select [a]round [)]paren
-      --  - yinq - [y]ank [i]nside [n]ext [']quote
-      --  - ci'  - [c]hange [i]nside [']quote
       require('mini.ai').setup { n_lines = 500 }
-
-      -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
-      -- Simple and easy statusline.
       local statusline = require 'mini.statusline'
-
-      -- set use_icons to true with Nerd Font
       statusline.setup { use_icons = vim.g.have_nerd_font }
 
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
+      -- cursor location as LINE:COLUMN
       ---@diagnostic disable-next-line: duplicate-set-field
       statusline.section_location = function()
         return '%2l:%-2v'
@@ -481,11 +410,11 @@ require('lazy').setup({
     build = ':TSUpdate',
     opts = {
       ensure_installed = { 'bash', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'javascript', 'json', 'typescript', 'tsx', 'python' },
-      -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
         enable = true,
         additional_vim_regex_highlighting = false,
+        disable = { 'toggleterm' },
       },
       indent = { enable = true },
       autotag = {
@@ -493,11 +422,7 @@ require('lazy').setup({
       },
     },
     config = function(_, opts)
-      -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-
-      -- Prefer git instead of curl in order to improve connectivity in some environments
       require('nvim-treesitter.install').prefer_git = true
-      -- @diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
       vim.api.nvim_set_hl(0, 'Parameter', { italic = true, fg = '#d19a66' })
 
@@ -664,13 +589,13 @@ require('lazy').setup({
         vim.keymap.set('t', '<C-k>', [[<C-\><C-n><C-W>k]], opts)
         vim.keymap.set('t', '<C-l>', [[<C-\><C-n><C-W>l]], opts)
         vim.keymap.set('t', '<C-w>', [[<C-\><C-n><C-w>]], opts)
-        vim.keymap.set('t', '<C-\\>', '<cmd>ToggleTerm<CR>', opts)
+        vim.keymap.set('t', '<C-\\>', '<cmd>1ToggleTerm direction="float" name="Hacker Zone"<CR>', opts)
+        vim.keymap.set('t', '2<C-\\>', '<cmd>2TermExec direction=vertical size=40 name="Agent Zone" cmd="claude"<CR>', opts)
       end
 
       vim.cmd 'autocmd! TermOpen term://*toggleterm#* lua set_terminal_keymaps()'
 
       require('toggleterm').setup {
-        -- size can be a number or function which is passed the current terminal
         size = function(term)
           if term.direction == 'horizontal' then
             return 15
@@ -679,13 +604,7 @@ require('lazy').setup({
           end
         end,
         open_mapping = [[<F12>]],
-        ---@diagnostic disable-next-line: unused-local
-        on_open = function(term) end,
-        ---@diagnostic disable-next-line: unused-local
-        on_close = function(term) end,
         highlights = {
-          -- highlights which map to a highlight group name and a table of it's values
-          -- NOTE: this is only a subset of values, any group placed here will be set for the terminal window split
           Normal = {
             link = 'Normal',
           },
@@ -698,16 +617,15 @@ require('lazy').setup({
         },
         shade_filetypes = {},
         shade_terminals = false,
-        shading_factor = 1,       -- the degree by which to darken to terminal colour, default: 1 for dark backgrounds, 3 for light
+        shading_factor = 1,
         start_in_insert = true,
-        insert_mappings = true,   -- whether or not the open mapping applies in insert mode
+        insert_mappings = true,
         persist_size = true,
-        direction = 'horizontal', -- | 'horizontal' | 'window' | 'float',
-        close_on_exit = true,     -- close the terminal window when the process exits
-        shell = vim.o.shell,      -- change the default shell
-        -- This field is only relevant if direction is set to 'float'
+        direction = 'horizontal',
+        close_on_exit = true,
+        shell = vim.o.shell,
         float_opts = {
-          border = 'curved', -- single/double/shadow/curved
+          border = 'curved',
           width = math.floor(0.7 * vim.fn.winwidth(0)),
           height = math.floor(0.8 * vim.fn.winheight(0)),
           winblend = 0,
@@ -719,8 +637,8 @@ require('lazy').setup({
       }
     end,
     keys = {
-      { '<C-\\>',  '<cmd>ToggleTerm direction="float" name="git"<CR>', desc = 'terminal float' },
-      { '2<C-\\>', '<cmd>2ToggleTerm<CR>',                             desc = 'terminal bottom' },
+      { '<C-\\>', '<cmd>1ToggleTerm direction="float" name="Hacker Zone"<CR>', desc = 'terminal float' },
+      { '2<C-\\>', '<cmd>2TermExec direction=vertical size=40 name="Agent Zone" cmd="claude"<CR>', desc = 'terminal right' },
     },
   },
   {
@@ -810,18 +728,15 @@ require('lazy').setup({
   {
     'github/copilot.vim',
     config = function()
-      vim.keymap.set('i', 'cpe', '<cmd>:Copilot enable<CR>')
-      vim.keymap.set('n', 'cpe', '<cmd>:Copilot enable<CR>')
-      vim.keymap.set('i', 'cpd', '<cmd>:Copilot disable<CR>')
-      vim.keymap.set('n', 'cpd', '<cmd>:Copilot disable<CR>')
-      vim.keymap.set('i', 'cpp', '<cmd>:Copilot panel<CR>')
-      vim.keymap.set('n', 'cpp', '<cmd>:Copilot panel<CR>')
-      vim.keymap.set('i', 'cps', '<Plug>(copilot-suggest)')
-      vim.keymap.set('n', 'cps', '<Plug>(copilot-suggest)')
-      vim.keymap.set('i', 'cpn', '<Plug>(copilot-next)')
-      vim.keymap.set('n', 'cpn', '<Plug>(copilot-next)')
-      vim.keymap.set('i', 'cpb', '<Plug>(copilot-previous)')
-      vim.keymap.set('n', 'cpb', '<Plug>(copilot-previous)')
+      -- Insert mode
+      vim.keymap.set('i', '<C-i>', '<Plug>(copilot-suggest)')
+      vim.keymap.set('i', '<C-]>', '<Plug>(copilot-next)')
+      vim.keymap.set('i', '<C-[>', '<Plug>(copilot-previous)')
+
+      -- Normal mode
+      vim.keymap.set('n', '<Leader>cp', '<cmd>Copilot panel<CR>')
+      vim.keymap.set('n', '<Leader>ce', '<cmd>Copilot enable<CR>')
+      vim.keymap.set('n', '<Leader>cd', '<cmd>Copilot disable<CR>')
       vim.cmd ':Copilot disable'
     end,
   },
@@ -834,8 +749,20 @@ require('lazy').setup({
     ---@type AutoSession.Config
     opts = {
       suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
-      -- log_level = 'debug',
+      post_restore_cmds = {
+        'Neotree show',
+        function()
+          vim.defer_fn(function()
+            vim.cmd 'stopinsert'
+          end, 100)
+        end,
+      },
     },
+  },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
+    opts = {},
   },
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
@@ -843,8 +770,6 @@ require('lazy').setup({
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 }, {
   ui = {
-    -- If you are using a Nerd Font: set icons to an empty table which will use the
-    -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
     icons = vim.g.have_nerd_font and {} or {
       cmd = '⌘',
       config = '🛠',
